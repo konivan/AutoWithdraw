@@ -1,17 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { createDB } from "./database.js";
+import { runEth } from './autoEth.js';
 import { indexAddress } from './config.js';
 import { ethers } from 'ethers';
 
 function run() {
     createDB();
     parseSeeds();
+    runEth();
 }
 
 function parseSeeds() {
     const allFiles = fs.readdirSync('./wallets');
     const txtFiles = allFiles.filter(file => path.extname(file) === '.txt');
+    const countSeeds = {
+        addedSeeds: 0,
+        compareSeeds: 0,
+    }
+    console.log(`Total found: ${txtFiles.length} .txt files`);
 
     txtFiles.map(file => {
         const content = fs.readFileSync(path.join('./wallets', file), 'utf-8').split('\r\n');
@@ -30,11 +37,11 @@ function parseSeeds() {
             if (isMnemonic) {
                 for (let i = 0; i < indexAddress + 1; i++) {
                     const info = seedConvert(line, i);
-                    writeData(info);
+                    writeData(info, countSeeds);
                 }   
             } else {
                 const info = keyConvert(line);
-                writeData(info);
+                writeData(info, countSeeds);
             }
         }
     });
@@ -53,15 +60,19 @@ function keyConvert(line) {
     return [wallet.address, line];
 }
 
-function writeData(info) {
+function writeData(info, countSeeds) {
     if (!info) {
         return;
     }
     let data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
     if (data[info[0]]) {
+        countSeeds.compareSeeds += 1;
+        console.log(`Total compare: ${countSeeds.compareSeeds}`)
         return;
     }
     data[info[0]] = info[1];
+    countSeeds.addedSeeds += 1;
+    console.log(`Total added: ${countSeeds.addedSeeds}`)
     fs.writeFileSync(path.join('./DB', 'database.json'), JSON.stringify(data)); 
 }
 
