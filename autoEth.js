@@ -13,19 +13,20 @@ export async function runEth() {
 }
 
 async function getBlocksEth() {
-    const subscription = await web3.eth.subscribe('newBlockHeaders');
-    subscription.on('data', async (block, error) => {
-        const lastBlock = await web3.eth.getBlock(block.number, true);
-        const ethTransactions = lastBlock?.transactions;
-        console.log(`Block ${lastBlock.number} | ETH`);
-        try {
+    try {
+        const subscription = await web3.eth.subscribe('newBlockHeaders');
+        subscription.on('data', async (block, error) => {
+            const lastBlock = await web3.eth.getBlock(block.number, true);
+            const ethTransactions = lastBlock?.transactions;
+            console.log(`Block ${lastBlock.number} | ETH`);
             for (let transaction of ethTransactions) {
                 transactionWalletEth(transaction);
             }
-        } catch (e) {
-            console.log(e);
-        }
-    });
+        });
+        subscription.on('error', (error) => console.log(error));
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 function transactionWalletEth(transaction) {

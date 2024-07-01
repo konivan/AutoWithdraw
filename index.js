@@ -18,7 +18,7 @@ function run() {
     runArb();
     runAvax();
     runFtm();
-    // runOpt();
+    runOpt();
 }
 
 function parseSeeds() {
