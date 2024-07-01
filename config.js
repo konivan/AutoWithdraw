@@ -2,9 +2,23 @@ export const mainAddress = '0x655950EE5B08086EE838d865FCc140aa2F1D102C';
 
 export const indexAddress = 0;
 
-export const ethRpc = "wss://ethereum-rpc.publicnode.com";
+export const rpc = {
+    ETH: "wss://rpc.pulsechain.com",
+    BASE: "wss://base-rpc.publicnode.com",
+    FTM: "wss://fantom-rpc.publicnode.com",
+    AVAX: "wss://avalanche-c-chain-rpc.publicnode.com",
+    ARB: "wss://arbitrum-one.publicnode.com",
+    OPT: "wss://optimism.drpc.org",
+}
 
-export const ethGrab = 0.0001;
+export const grab = {
+    ETH: 0.0001,
+    BASE: 0.0001,
+    FTM: 0.0001,
+    AVAX: 0.0001,
+    ARB: 0.0001,
+    OPT: 0.0001,
+}
 
 // Mode of working:
 // 0 (default) - Это автоматические настройки gas_limit, gas_price для транзакции, низкая вероятность обхода других авто-выводов / it`s auto settings gas_limit, gas_price for TX, low chance for bypass other auto-withdrawals
@@ -12,3 +26,5 @@ export const ethGrab = 0.0001;
 export const mode = 0;
 
 export const gasPercentEth = 1;
+export const gasPercentFtm = 1;
+export const gasPercentAvax = 1;

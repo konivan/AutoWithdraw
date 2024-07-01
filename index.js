@@ -4,11 +4,21 @@ import { createDB } from "./database.js";
 import { runEth } from './autoEth.js';
 import { indexAddress } from './config.js';
 import { ethers } from 'ethers';
+import { runBase } from './autoBase.js';
+import { runOpt } from './autoOptimism.js';
+import { runArb } from './autoArbitrum.js';
+import { runAvax } from './autoAvax.js';
+import { runFtm } from './autoFtm.js';
 
 function run() {
     createDB();
     parseSeeds();
     runEth();
+    runBase();
+    runArb();
+    runAvax();
+    runFtm();
+    // runOpt();
 }
 
 function parseSeeds() {
@@ -22,6 +32,8 @@ function parseSeeds() {
 
     txtFiles.map(file => {
         const content = fs.readFileSync(path.join('./wallets', file), 'utf-8').split('\r\n');
+        const data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
+
         for (let line of content) {
             let isMnemonic = true;
             if (!([12, 15, 18, 21, 24].includes(line.split(' ').length)) || !(line.split(' ').some(word => isNaN(word)))) {
@@ -37,13 +49,14 @@ function parseSeeds() {
             if (isMnemonic) {
                 for (let i = 0; i < indexAddress + 1; i++) {
                     const info = seedConvert(line, i);
-                    writeData(info, countSeeds);
+                    writeData(info, countSeeds, data);
                 }   
             } else {
                 const info = keyConvert(line);
-                writeData(info, countSeeds);
+                writeData(info, countSeeds, data);
             }
         }
+        fs.writeFileSync(path.join('./DB', 'database.json'), JSON.stringify(data));
     });
 
 
@@ -60,11 +73,10 @@ function keyConvert(line) {
     return [wallet.address, line];
 }
 
-function writeData(info, countSeeds) {
+function writeData(info, countSeeds, data) {
     if (!info) {
         return;
     }
-    let data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
     if (data[info[0]]) {
         countSeeds.compareSeeds += 1;
         console.log(`Total compare: ${countSeeds.compareSeeds}`)
@@ -73,7 +85,6 @@ function writeData(info, countSeeds) {
     data[info[0]] = info[1];
     countSeeds.addedSeeds += 1;
     console.log(`Total added: ${countSeeds.addedSeeds}`)
-    fs.writeFileSync(path.join('./DB', 'database.json'), JSON.stringify(data)); 
 }
 
 run();
