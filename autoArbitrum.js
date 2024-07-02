@@ -7,26 +7,31 @@ let web3 = null
 let data = null
 
 export async function runArb() {
-    web3 = new Web3(new Web3.providers.WebsocketProvider(rpc.ARB));
+    try {
+        web3 = new Web3(new Web3.providers.WebsocketProvider(rpc.ARB));
+    } catch (error) {
+        console.log("Не удалось подключиться к сети ARBITRUM")
+        return;
+    }
     data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
     await getBlocksEth();
 }
 
 async function getBlocksEth() {
-    try {
-        const subscription = await web3.eth.subscribe('newBlockHeaders');
-        subscription.on('data', async (block, error) => {
+    const subscription = await web3.eth.subscribe('newBlockHeaders');
+    subscription.on('data', async (block, error) => {
+        try {
             const lastBlock = await web3.eth.getBlock(block.number, true);
             const ethTransactions = lastBlock?.transactions;
-            console.log(`Block ${lastBlock.number} | ARBITRUM`);
+            console.log(`Block ${lastBlock?.number} | ARBITRUM`);
             for (let transaction of ethTransactions) {
                 transactionWalletEth(transaction);
             }
-        });
-        subscription.on('error', (error) => console.log(error));
-    } catch (error) {
-        console.log(error)
-    }
+        } catch (error) {
+            console.log(error)
+        }
+    });
+    subscription.on('error', (error) => console.log(error));
 }
 
 function transactionWalletEth(transaction) {

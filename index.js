@@ -9,16 +9,20 @@ import { runOpt } from './autoOptimism.js';
 import { runArb } from './autoArbitrum.js';
 import { runAvax } from './autoAvax.js';
 import { runFtm } from './autoFtm.js';
+import { runMatic } from './autoMatic.js';
+import { runBnb } from './autoBnb.js';
 
 function run() {
     createDB();
     parseSeeds();
-    runEth();
+    // runEth();
     runBase();
-    runArb();
-    runAvax();
-    runFtm();
-    runOpt();
+    // runArb();
+    // runAvax();
+    // runFtm();
+    // runOpt();
+    // runMatic();
+    // runBnb();
 }
 
 function parseSeeds() {
@@ -65,12 +69,12 @@ function parseSeeds() {
 function seedConvert(line, index) {
     const mnemonicInstance = ethers.Mnemonic.fromPhrase(line);
     const wallet = ethers.HDNodeWallet.fromMnemonic(mnemonicInstance, `m/44'/60'/0'/0/${index}`);
-    return [wallet.address, wallet.privateKey];
+    return [wallet.address.toLowerCase(), wallet.privateKey];
 }
 
 function keyConvert(line) {
     const wallet = new ethers.Wallet(line);
-    return [wallet.address, line];
+    return [wallet.address.toLowerCase(), line];
 }
 
 function writeData(info, countSeeds, data) {
