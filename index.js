@@ -15,14 +15,14 @@ import { runBnb } from './autoBnb.js';
 function run() {
     createDB();
     parseSeeds();
-    // runEth();
+    runEth();
     runBase();
-    // runArb();
-    // runAvax();
-    // runFtm();
-    // runOpt();
-    // runMatic();
-    // runBnb();
+    runArb();
+    runAvax();
+    runFtm();
+    runOpt();
+    runMatic();
+    runBnb();
 }
 
 function parseSeeds() {

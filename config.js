@@ -1,6 +1,6 @@
-export const mainAddress = "0x75f70a5bcc20a71a12f4587d0d2e690c4fcb0235";
+export const mainAddress = "0x655950EE5B08086EE838d865FCc140aa2F1D102C";
 
-export const indexAddress = 0;
+export const indexAddress = 0; // Индексы получаемых адресов с фразы (например: если указан 0, тогда 1 адрес, если указано 1, тогда 2 адреса 0-1 индексы
 
 // RPC nodes
 export const rpc = {
@@ -30,6 +30,7 @@ export const grab = {
 // 1 - Это использование процентных настроек gas с вычитанием заданного процента из баланса, хороший шанс обхода других авто-выводов / it`s use of percentage settings gas with a deduction from balance, good chance for bypass other auto-withdrawals
 export const mode = 0;
 
+// Процент использования газа от баланса
 export const gasPercentEth = 1;
 export const gasPercentFtm = 1;
 export const gasPercentAvax = 1;
