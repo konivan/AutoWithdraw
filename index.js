@@ -35,6 +35,7 @@ function parseSeeds() {
     console.log(`Total found: ${txtFiles.length} .txt files`);
 
     txtFiles.map(file => {
+    try {
         const content = fs.readFileSync(path.join('./wallets', file), 'utf-8').split('\r\n');
         const data = JSON.parse(fs.readFileSync(path.join('./DB', 'database.json')));
 
@@ -52,16 +53,24 @@ function parseSeeds() {
 
             if (isMnemonic) {
                 for (let i = 0; i < indexAddress + 1; i++) {
-                    const info = seedConvert(line, i);
-                    writeData(info, countSeeds, data);
+                    try {
+                        const info = seedConvert(line, i);
+                        writeData(info, countSeeds, data);
+                    } catch (e) {
+                        console.log("Невалидная мнемоника")
+                    }
                 }   
             } else {
-                const info = keyConvert(line);
-                writeData(info, countSeeds, data);
+                try {
+                    const info = keyConvert(line);
+                    writeData(info, countSeeds, data);
+                } catch (e) {
+                    console.log("Невалидный ключ")
+                }
             }
         }
         fs.writeFileSync(path.join('./DB', 'database.json'), JSON.stringify(data));
-    });
+    } catch (e) {console.log(e)}});
 
 
 }
