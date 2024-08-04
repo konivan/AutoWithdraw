@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import * as fs from 'fs';
 import * as path from 'path';
-import { rpc, grab, mainAddress, gasPercentAvax } from "./config.js";
+import { rpc, grab, mainAddress, gasPercentAvax, mode } from "./config.js";
 
 let web3 = null
 let data = null
